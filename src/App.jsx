@@ -15,25 +15,43 @@ import {
   Globe2,
   Heart,
   Landmark,
+  LogIn,
+  LogOut,
   Mail,
   MapPin,
   Menu as MenuIcon,
   Phone,
   Quote,
+  RefreshCw,
+  Search,
   Star,
   TrendingUp,
   Users,
   Utensils,
   X,
 } from 'lucide-react'
-import { FaFacebookF, FaInstagram, FaWhatsapp, FaYoutube } from 'react-icons/fa6'
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa6'
 import './App.css'
+import {
+  fetchOwnerLeads,
+  getLocalLeads,
+  getOwnerSession,
+  isCloudConfigured,
+  ownerSignIn,
+  ownerSignOut,
+  persistLead,
+  updateOwnerLeadStatus,
+} from './leadService'
 
 const WA = '919998321265'
 const phone = '+91 99983 21265'
-const hours = '11:00 AM - 4:00 PM & 7:00 PM - 11:30 PM'
-const weekendNote = 'Saturday, Sunday & festive days: please come only after booking confirmation.'
-const LEADS_KEY = 'kv_leads'
+const email = 'info@kathiyawadivillage.com'
+const hours = '11:00 AM - 3:00 PM & 7:00 PM - 11:00 PM'
+const weekendNote = 'Saturday, Sunday and festive-season tables fill quickly. Please book in advance and visit only after branch confirmation.'
+const bookingSlots = [
+  '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+  '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30',
+]
 
 const branches = [
   {
@@ -42,7 +60,7 @@ const branches = [
     capacity: '130+',
     address: 'Sama-Savli Rd, Vemali, Vadodara, Gujarat 390024',
     tag: 'Family flagship',
-    wa: '919999999991',
+    wa: '919081219990',
     mapQuery: 'Sama-Savli Rd, Vemali, Vadodara, Gujarat 390024',
     reviewQuery: 'Kathiyawadi Village, Sama-Savli Rd, Vemali, Vadodara, Gujarat 390024',
   },
@@ -52,7 +70,7 @@ const branches = [
     capacity: '120+',
     address: 'Vasant Vihar FF 105, Nilamber Bellisimmo 3, Bhayli, Vadodara, Gujarat 391410',
     tag: 'Celebration favourite',
-    wa: '919999999992',
+    wa: '919173361977',
     mapQuery: 'Vasant Vihar FF 105, Nilamber Bellisimmo 3, Bhayli, Vadodara, Gujarat 391410',
     reviewQuery: 'Kathiyawadi Village, Vasant Vihar FF 105, Nilamber Bellisimmo 3, Bhayli, Vadodara, Gujarat 391410',
   },
@@ -62,7 +80,7 @@ const branches = [
     capacity: '100+',
     address: 'Shop No. FF 102/103, La Majesty Complex, near Anugrha Hospital, Near Tulsidham Char Rasta, Krupal Society, Manjalpur, Vadodara, Gujarat 390009',
     tag: 'Neighbourhood dining',
-    wa: '919999999993',
+    wa: '919173350151',
     mapQuery: 'Shop No. FF 102/103, La Majesty Complex, near Anugrha Hospital, Near Tulsidham Char Rasta, Krupal Society, Manjalpur, Vadodara, Gujarat 390009',
     reviewQuery: 'Kathiyawadi Village, La Majesty Complex, Manjalpur, Vadodara, Gujarat 390009',
   },
@@ -72,7 +90,7 @@ const branches = [
     capacity: '140+',
     address: 'Eastern Arcade Complex, NH 08, beside Hariyali Banquet Hall, Vadodara, Gujarat 390019',
     tag: 'Grand family dining',
-    wa: '919999999994',
+    wa: '919173569597',
     mapQuery: 'Eastern Arcade Complex, NH 08, beside Hariyali Banquet Hall, Vadodara, Gujarat 390019',
     reviewQuery: 'Kathiyawadi Village, Eastern Arcade Complex, NH 08, Vadodara, Gujarat 390019',
   },
@@ -82,7 +100,7 @@ const branches = [
     capacity: '150+',
     address: 'Vadadla NH.NO. 48, Chokdi, Haldarva, Bharuch, Gujarat 392015',
     tag: 'Largest celebration space',
-    wa: '919999999995',
+    wa: '919173707651',
     mapQuery: 'Vadadla NH.NO. 48, Chokdi, Haldarva, Bharuch, Gujarat 392015',
     reviewQuery: 'Kathiyawadi Village, Vadadla NH.NO. 48, Chokdi, Haldarva, Bharuch, Gujarat 392015',
   },
@@ -92,7 +110,7 @@ const branches = [
     capacity: 'Coming Soon',
     address: '6XR9+3C2, Shivraj Sinh Rd, Dwarka, Gujarat 361335',
     tag: 'Coastal expansion',
-    wa: '919999999996',
+    wa: '919173356617',
     mapQuery: '6XR9+3C2, Shivraj Sinh Rd, Dwarka, Gujarat 361335',
     reviewQuery: 'Kathiyawadi Village, 6XR9+3C2, Shivraj Sinh Rd, Dwarka, Gujarat 361335',
   },
@@ -102,7 +120,7 @@ const branches = [
     capacity: 'Coming Soon',
     address: '1519 Finnegans Ln, North Brunswick Township, NJ 08902, United States',
     tag: 'International expansion',
-    wa: '19199999999',
+    wa: '17323056549',
     mapQuery: '1519 Finnegans Ln, North Brunswick Township, NJ 08902, United States',
     reviewQuery: 'Kathiyawadi Village, 1519 Finnegans Ln, North Brunswick Township, NJ 08902, United States',
   },
@@ -147,11 +165,13 @@ const reviewsLink = branch =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.reviewQuery || branch.mapQuery || branch.address)}`
 
 const capacityLabel = branch => (branch.capacity.includes('+') ? `${branch.capacity} Guests` : branch.capacity)
-
-function saveLead(lead) {
-  const saved = JSON.parse(localStorage.getItem(LEADS_KEY) || '[]')
-  localStorage.setItem(LEADS_KEY, JSON.stringify([lead, ...saved]))
-  window.dispatchEvent(new Event('kv-leads-updated'))
+const todayValue = () => {
+  const now = new Date()
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10)
+}
+const displayTime = value => {
+  const [hour, minute] = value.split(':').map(Number)
+  return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`
 }
 
 function ScrollTop() {
@@ -184,8 +204,7 @@ function Header() {
       </div>
       <div className="nav-wrap">
         <Link to="/" className="brand" onClick={close}>
-          <img src="/images/kathiyawadi-village-logo.jpg" alt="Kathiyawadi Village" />
-          <span><b>Kathiyawadi Village</b><small>Pure Veg - Multi Cuisine</small></span>
+          <img src="/images/kathiyawadi-village-logo-cropped.png" alt="Kathiyawadi Village - Multi Cuisine Restaurant" />
         </Link>
         <nav className={open ? 'nav open' : 'nav'}>
           <NavLink to="/" onClick={close}>Home</NavLink>
@@ -255,13 +274,12 @@ function Footer() {
       <footer>
         <div className="footer-main">
           <div className="footer-brand">
-            <img src="/images/kathiyawadi-village-logo.jpg" alt="Kathiyawadi Village" />
+            <img src="/images/kathiyawadi-village-logo-cropped.png" alt="Kathiyawadi Village - Multi Cuisine Restaurant" />
             <p>From Gujarat To The World - serving authentic hospitality, one plate at a time.</p>
             <div className="socials">
-              <a aria-label="Instagram" href="https://instagram.com" target="_blank" rel="noreferrer"><FaInstagram /></a>
-              <a aria-label="Facebook" href="https://facebook.com" target="_blank" rel="noreferrer"><FaFacebookF /></a>
-              <a aria-label="YouTube" href="https://youtube.com" target="_blank" rel="noreferrer"><FaYoutube /></a>
-              <button aria-label="WhatsApp" type="button" onClick={() => whatsapp('Hello Kathiyawadi Village, I would like to connect.')}><FaWhatsapp /></button>
+              <a aria-label="LinkedIn" href="https://in.linkedin.com/in/kathiyawadi-village-025b37322" target="_blank" rel="noreferrer"><FaLinkedinIn /></a>
+              <a aria-label="Instagram" href="https://www.instagram.com/kathiyawadi_village" target="_blank" rel="noreferrer"><FaInstagram /></a>
+              <a aria-label="Facebook" href="https://www.facebook.com/people/Kathiyawadi-village/61577657022329/" target="_blank" rel="noreferrer"><FaFacebookF /></a>
             </div>
           </div>
           <div className="footer-links">
@@ -283,7 +301,7 @@ function Footer() {
           <div className="footer-contact">
             <h4>Contact & Hours</h4>
             <a href={`tel:${phone}`}><Phone /> <span><b>{phone}</b><small>Central reservations</small></span></a>
-            <a href="mailto:hello@kathiyawadivillage.com"><Mail /> <span><b>hello@kathiyawadivillage.com</b><small>General enquiries</small></span></a>
+            <a href={`mailto:${email}`}><Mail /> <span><b>{email}</b><small>General enquiries</small></span></a>
             <p><Clock3 /><span><b>{hours}</b><small>Open every day</small></span></p>
             <p><MapPin /><span><b>Vadodara, Gujarat</b><small>Khodal Foods & Hospitality Pvt. Ltd.</small></span></p>
           </div>
@@ -297,6 +315,10 @@ function Footer() {
             <a href="#">Sitemap</a>
           </div>
           <small>Authentic hospitality, one plate at a time.</small>
+        </div>
+        <div className="developer-credit">
+          Designed &amp; Developed by
+          <a href="https://apfpuniversal.com/" target="_blank" rel="noreferrer">APFP Universal</a>
         </div>
       </footer>
       <div className="mobile-bar">
@@ -351,6 +373,7 @@ function ExpansionCarousel() {
 }
 
 function BookingForm({ event = false, initialLocation = 'Sama' }) {
+  const [error, setError] = useState('')
   const [form, setForm] = useState({
     name: '',
     mobile: '',
@@ -361,15 +384,29 @@ function BookingForm({ event = false, initialLocation = 'Sama' }) {
     request: '',
     eventType: 'Birthday Party',
   })
-  const set = e => setForm({ ...form, [e.target.name]: e.target.value })
+  const set = e => {
+    setError('')
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+  const selectedDate = form.date ? new Date(`${form.date}T12:00:00`) : null
+  const isWeekend = selectedDate && [0, 6].includes(selectedDate.getDay())
 
   const submit = e => {
     e.preventDefault()
+    if (form.date < todayValue()) {
+      setError('Please choose today or a future date.')
+      return
+    }
+    if (!event && !bookingSlots.includes(form.time)) {
+      setError(`Please select a valid booking time during ${hours}.`)
+      return
+    }
+
     const branch = branches.find(item => item.name === form.location) || branches[0]
     const lead = {
       id: `KV-${Date.now()}`,
       type: event ? 'Event & Catering' : 'Table Booking',
-      createdAt: new Date().toLocaleString(),
+      createdAt: new Date().toISOString(),
       name: form.name,
       mobile: form.mobile,
       location: form.location,
@@ -378,8 +415,9 @@ function BookingForm({ event = false, initialLocation = 'Sama' }) {
       date: form.date,
       time: event ? '' : form.time,
       request: form.request || 'None',
+      status: 'new',
     }
-    saveLead(lead)
+    persistLead(lead)
 
     whatsapp(
       `${event ? 'New Event & Catering Enquiry' : 'New Table Booking Inquiry'}\n\n` +
@@ -390,7 +428,7 @@ function BookingForm({ event = false, initialLocation = 'Sama' }) {
       `Branch: ${form.location}\n` +
       `Guests: ${form.guests}\n` +
       `Date: ${form.date}\n` +
-      `${event ? '' : `Time: ${form.time}\n`}` +
+      `${event ? '' : `Time: ${displayTime(form.time)}\n`}` +
       `Special Request: ${form.request || 'None'}\n\n` +
       `Restaurant Timing: ${hours}\n` +
       weekendNote,
@@ -420,24 +458,67 @@ function BookingForm({ event = false, initialLocation = 'Sama' }) {
           {branches.map(branch => <option key={branch.slug}>{branch.name}</option>)}
         </select>
       </label>
-      <label><span>Date</span><input required type="date" name="date" value={form.date} onChange={set} /></label>
-      {!event && <label><span>Time</span><input required type="time" name="time" value={form.time} onChange={set} /></label>}
+      <label><span>Date</span><input required type="date" min={todayValue()} name="date" value={form.date} onChange={set} /></label>
+      {!event && (
+        <label>
+          <span>Time</span>
+          <select required name="time" value={form.time} onChange={set}>
+            <option value="">Select a valid time</option>
+            <optgroup label="Lunch: 11:00 AM - 3:00 PM">
+              {bookingSlots.slice(0, 8).map(slot => <option value={slot} key={slot}>{displayTime(slot)}</option>)}
+            </optgroup>
+            <optgroup label="Dinner: 7:00 PM - 11:00 PM">
+              {bookingSlots.slice(8).map(slot => <option value={slot} key={slot}>{displayTime(slot)}</option>)}
+            </optgroup>
+          </select>
+        </label>
+      )}
       <label><span>Guests</span><input required type="number" name="guests" value={form.guests} onChange={set} placeholder="e.g. 6" /></label>
       <label className="wide"><span>Special Request</span><input name="request" value={form.request} onChange={set} placeholder="Birthday, high chair, dietary note..." /></label>
-      <p className="booking-note wide"><Clock3 size={15} /> Timing: {hours}. {weekendNote}</p>
+      {error && <p className="booking-error wide" role="alert">{error}</p>}
+      <p className={`booking-note wide ${isWeekend ? 'weekend-warning' : ''}`}><Clock3 size={15} /> Timing: {hours}. {weekendNote}</p>
       <button className="btn solid wide" type="submit"><FaWhatsapp /> Send on WhatsApp <ArrowRight size={17} /></button>
     </form>
   )
 }
 
 function Home() {
+  const heroVideoRef = useRef(null)
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const syncPlayback = () => {
+      if (!heroVideoRef.current) return
+      if (reducedMotion.matches) {
+        heroVideoRef.current.pause()
+      } else {
+        heroVideoRef.current.play().catch(() => {})
+      }
+    }
+    syncPlayback()
+    reducedMotion.addEventListener('change', syncPlayback)
+    return () => reducedMotion.removeEventListener('change', syncPlayback)
+  }, [])
+
   return (
     <main>
       <section className="hero">
+        <video
+          ref={heroVideoRef}
+          className="hero-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster="/images/sev-tameta-hero-poster.jpg"
+          aria-hidden="true"
+        >
+          <source src="/videos/sev-tameta-hero.mp4" type="video/mp4" />
+        </video>
         <div className="hero-content">
           <span className="eyebrow">Pure Vegetarian - Since 2014</span>
-          <h1>Authentic Kathiyawadi <em>Hospitality.</em></h1>
-          <p>Experience Gujarat's most loved flavours, served with warmth, tradition, and premium hospitality.</p>
+          <h1>Authentic Kathiyawadi <em>Flavours, Made Fresh.</em></h1>
+          <p>From the first sizzle to the final serving, experience tradition prepared with passion and welcomed with genuine hospitality.</p>
           <div className="hero-actions">
             <a className="btn gold" href="#booking">Book Your Table <ArrowRight size={18} /></a>
             <Link className="btn glass" to="/locations">Explore Locations</Link>
@@ -787,7 +868,7 @@ function LeadForm({ type }) {
     const lead = {
       id: `KV-${Date.now()}`,
       type,
-      createdAt: new Date().toLocaleString(),
+      createdAt: new Date().toISOString(),
       name: form.name,
       mobile: form.mobile,
       location: form.city,
@@ -797,8 +878,9 @@ function LeadForm({ type }) {
       time: '',
       request: form.message || 'None',
       budget: form.budget,
+      status: 'new',
     }
-    saveLead(lead)
+    persistLead(lead)
     whatsapp(`New ${type} Enquiry\n\nLead ID: ${lead.id}\nName: ${form.name}\nMobile: ${form.mobile}\nCity: ${form.city}\n${form.budget ? `Budget: ${form.budget}\n` : ''}Message: ${form.message}`)
   }
 
@@ -888,67 +970,223 @@ function Contact() {
         <div><Phone /><h3>Call Us</h3><a href={`tel:${phone}`}>{phone}</a></div>
         <div><FaWhatsapp /><h3>WhatsApp</h3><button type="button" onClick={() => whatsapp('Hello Kathiyawadi Village, I would like to get in touch.')}>Start a conversation</button></div>
         <div><MapPin /><h3>Visit Us</h3><Link to="/locations">Explore all locations</Link></div>
-        <div><Globe2 /><h3>Email</h3><a href="mailto:hello@kathiyawadivillage.com">hello@kathiyawadivillage.com</a></div>
+        <div><Globe2 /><h3>Email</h3><a href={`mailto:${email}`}>{email}</a></div>
       </section>
     </main>
   )
 }
 
 function LeadDashboard() {
-  const [leads, setLeads] = useState(() => JSON.parse(localStorage.getItem(LEADS_KEY) || '[]'))
-  const load = () => setLeads(JSON.parse(localStorage.getItem(LEADS_KEY) || '[]'))
+  const [session, setSession] = useState(getOwnerSession)
+  const [credentials, setCredentials] = useState({
+    email: import.meta.env.VITE_ADMIN_EMAIL || '',
+    password: '',
+  })
+  const [leads, setLeads] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [filters, setFilters] = useState({
+    location: 'all',
+    type: 'all',
+    status: 'all',
+    period: 'all',
+    from: '',
+    to: '',
+    search: '',
+  })
+
   useEffect(() => {
+    if (isCloudConfigured && !session) return undefined
+    let active = true
+    const load = async () => {
+      setLoading(true)
+      try {
+        const data = await fetchOwnerLeads(session)
+        if (active) setLeads(data)
+      } catch (loadError) {
+        if (active) setError(loadError.message)
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    load()
     window.addEventListener('kv-leads-updated', load)
-    return () => window.removeEventListener('kv-leads-updated', load)
-  }, [])
+    return () => {
+      active = false
+      window.removeEventListener('kv-leads-updated', load)
+    }
+  }, [session])
+
+  const refresh = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      setLeads(await fetchOwnerLeads(session))
+    } catch (loadError) {
+      setError(loadError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const login = async e => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      setSession(await ownerSignIn(credentials.email, credentials.password))
+      setCredentials(current => ({ ...current, password: '' }))
+    } catch (loginError) {
+      setError(loginError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const logout = () => {
+    ownerSignOut()
+    setSession(null)
+    setLeads([])
+  }
+
+  const filteredLeads = useMemo(() => {
+    const now = new Date()
+    const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const startTomorrow = new Date(startToday)
+    startTomorrow.setDate(startTomorrow.getDate() + 1)
+    const startYesterday = new Date(startToday)
+    startYesterday.setDate(startYesterday.getDate() - 1)
+    const startWeek = new Date(startToday)
+    startWeek.setDate(startWeek.getDate() - startWeek.getDay())
+    const startMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const startYear = new Date(now.getFullYear(), 0, 1)
+    const query = filters.search.trim().toLowerCase()
+
+    return leads.filter(lead => {
+      const created = new Date(lead.createdAt)
+      const matchesLocation = filters.location === 'all' || lead.location === filters.location
+      const matchesType = filters.type === 'all' || lead.type === filters.type
+      const matchesStatus = filters.status === 'all' || (lead.status || 'new') === filters.status
+      const matchesSearch = !query || [lead.id, lead.name, lead.mobile, lead.location, lead.request]
+        .some(value => String(value || '').toLowerCase().includes(query))
+
+      let matchesPeriod = true
+      if (filters.period === 'today') matchesPeriod = created >= startToday && created < startTomorrow
+      if (filters.period === 'yesterday') matchesPeriod = created >= startYesterday && created < startToday
+      if (filters.period === 'week') matchesPeriod = created >= startWeek && created < startTomorrow
+      if (filters.period === 'month') matchesPeriod = created >= startMonth && created < startTomorrow
+      if (filters.period === 'year') matchesPeriod = created >= startYear && created < startTomorrow
+      if (filters.period === 'custom') {
+        const from = filters.from ? new Date(`${filters.from}T00:00:00`) : null
+        const to = filters.to ? new Date(`${filters.to}T23:59:59`) : null
+        matchesPeriod = (!from || created >= from) && (!to || created <= to)
+      }
+
+      return matchesLocation && matchesType && matchesStatus && matchesSearch && matchesPeriod
+    })
+  }, [filters, leads])
 
   const csv = useMemo(() => {
-    const headers = ['ID', 'Type', 'Created At', 'Name', 'Mobile', 'Location/City', 'Event Type', 'Guests', 'Date', 'Time', 'Budget', 'Request']
-    const rows = leads.map(lead => [lead.id, lead.type, lead.createdAt, lead.name, lead.mobile, lead.location, lead.eventType, lead.guests, lead.date, lead.time, lead.budget || '', lead.request])
+    const headers = ['ID', 'Type', 'Status', 'Created At', 'Name', 'Mobile', 'Location/City', 'Event Type', 'Guests', 'Booking Date', 'Booking Time', 'Budget', 'Request']
+    const rows = filteredLeads.map(lead => [lead.id, lead.type, lead.status || 'new', lead.createdAt, lead.name, lead.mobile, lead.location, lead.eventType, lead.guests, lead.date, lead.time, lead.budget || '', lead.request])
     return [headers, ...rows].map(row => row.map(value => `"${String(value || '').replaceAll('"', '""')}"`).join(',')).join('\n')
-  }, [leads])
+  }, [filteredLeads])
 
   const downloadCsv = () => {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = 'kathiyawadi-village-leads.csv'
+    link.download = `kathiyawadi-village-leads-${todayValue()}.csv`
     link.click()
     URL.revokeObjectURL(url)
   }
 
-  const clearLeads = () => {
-    localStorage.removeItem(LEADS_KEY)
-    setLeads([])
+  const updateStatus = async (id, status) => {
+    setError('')
+    try {
+      await updateOwnerLeadStatus(session, id, status)
+      setLeads(current => current.map(lead => lead.id === id ? { ...lead, status } : lead))
+    } catch (statusError) {
+      setError(statusError.message)
+    }
+  }
+
+  if (!isCloudConfigured) {
+    return (
+      <main>
+        <PageHero eyebrow="Owner CMS" title="Connect the secure lead dashboard." text="The dashboard is built and ready for its private database connection." />
+        <section className="admin-login section-pad">
+          <div className="admin-login-card">
+            <Landmark />
+            <h2>Cloud setup required</h2>
+            <p>Add the Supabase URL and anonymous key from <code>.env.example</code>, run <code>supabase/schema.sql</code>, and create the owner account in Supabase Authentication.</p>
+            <p className="dashboard-note">{getLocalLeads().length} lead(s) are currently held in this browser and will remain available as a fallback.</p>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
+  if (!session) {
+    return (
+      <main>
+        <PageHero eyebrow="Private Owner Access" title="Sign in to your lead dashboard." text="Bookings and enquiries are available only to authorized Kathiyawadi Village owners." />
+        <section className="admin-login section-pad">
+          <form className="admin-login-card" onSubmit={login}>
+            <LogIn />
+            <h2>Owner Login</h2>
+            <label><span>Email</span><input required type="email" value={credentials.email} onChange={e => setCredentials({ ...credentials, email: e.target.value })} /></label>
+            <label><span>Password</span><input required type="password" value={credentials.password} onChange={e => setCredentials({ ...credentials, password: e.target.value })} /></label>
+            {error && <p className="booking-error" role="alert">{error}</p>}
+            <button className="btn solid" type="submit" disabled={loading}>{loading ? 'Signing in...' : 'Sign In Securely'}</button>
+          </form>
+        </section>
+      </main>
+    )
   }
 
   return (
     <main>
-      <PageHero eyebrow="Owner Lead List" title="Booking and enquiry leads." text="This dashboard stores leads created from this browser and lets the owner export them as a CSV list." />
+      <PageHero eyebrow="Owner CMS" title="Booking and enquiry leads." text="Filter, review and manage every lead captured across Kathiyawadi Village locations." />
       <section className="lead-dashboard section-pad">
+        <div className="admin-toolbar">
+          <span>Signed in as <b>{session.email}</b></span>
+          <button className="btn outline" type="button" onClick={logout}><LogOut size={16} /> Sign Out</button>
+        </div>
         <div className="lead-summary">
           <div><b>{leads.length}</b><span>Total leads saved</span></div>
-          <button className="btn solid" type="button" onClick={downloadCsv} disabled={!leads.length}><Download size={17} /> Download CSV</button>
-          <button className="btn outline" type="button" onClick={clearLeads} disabled={!leads.length}>Clear List</button>
+          <div><b>{filteredLeads.length}</b><span>Matching filters</span></div>
+          <button className="btn solid" type="button" onClick={downloadCsv} disabled={!filteredLeads.length}><Download size={17} /> Download CSV</button>
+          <button className="btn outline" type="button" onClick={refresh} disabled={loading}><RefreshCw size={17} /> {loading ? 'Loading...' : 'Refresh'}</button>
         </div>
-        <p className="dashboard-note">For a permanent owner list across all customer devices, connect this same form data to Google Sheets, Formspree, Firebase or a backend API.</p>
+        <div className="lead-filters">
+          <label><span>Location</span><select value={filters.location} onChange={e => setFilters({ ...filters, location: e.target.value })}><option value="all">All locations</option>{[...new Set(leads.map(lead => lead.location).filter(Boolean))].sort().map(location => <option key={location}>{location}</option>)}</select></label>
+          <label><span>Enquiry Type</span><select value={filters.type} onChange={e => setFilters({ ...filters, type: e.target.value })}><option value="all">All types</option>{[...new Set(leads.map(lead => lead.type).filter(Boolean))].sort().map(type => <option key={type}>{type}</option>)}</select></label>
+          <label><span>Status</span><select value={filters.status} onChange={e => setFilters({ ...filters, status: e.target.value })}><option value="all">All statuses</option><option value="new">New</option><option value="contacted">Contacted</option><option value="confirmed">Confirmed</option><option value="closed">Closed</option></select></label>
+          <label><span>Received</span><select value={filters.period} onChange={e => setFilters({ ...filters, period: e.target.value })}><option value="all">All time</option><option value="today">Today</option><option value="yesterday">Yesterday</option><option value="week">This week</option><option value="month">This month</option><option value="year">This year</option><option value="custom">Custom dates</option></select></label>
+          {filters.period === 'custom' && <label><span>From</span><input type="date" value={filters.from} onChange={e => setFilters({ ...filters, from: e.target.value })} /></label>}
+          {filters.period === 'custom' && <label><span>To</span><input type="date" value={filters.to} onChange={e => setFilters({ ...filters, to: e.target.value })} /></label>}
+          <label className="filter-search"><span>Search</span><div><Search size={15} /><input value={filters.search} onChange={e => setFilters({ ...filters, search: e.target.value })} placeholder="Name, mobile or lead ID" /></div></label>
+        </div>
+        {error && <p className="booking-error" role="alert">{error}</p>}
         <div className="lead-table-wrap">
           <table>
-            <thead><tr><th>Time</th><th>Type</th><th>Name</th><th>Mobile</th><th>Location</th><th>Guests</th><th>Date</th><th>Request</th></tr></thead>
+            <thead><tr><th>Received</th><th>Type</th><th>Status</th><th>Name</th><th>Mobile</th><th>Location</th><th>Guests</th><th>Booking</th><th>Request</th></tr></thead>
             <tbody>
-              {leads.length ? leads.map(lead => (
+              {filteredLeads.length ? filteredLeads.map(lead => (
                 <tr key={lead.id}>
-                  <td>{lead.createdAt}</td>
+                  <td>{new Date(lead.createdAt).toLocaleString()}</td>
                   <td>{lead.type}</td>
+                  <td><select className={`status-select status-${lead.status || 'new'}`} value={lead.status || 'new'} onChange={e => updateStatus(lead.id, e.target.value)}><option value="new">New</option><option value="contacted">Contacted</option><option value="confirmed">Confirmed</option><option value="closed">Closed</option></select></td>
                   <td>{lead.name}</td>
-                  <td>{lead.mobile}</td>
+                  <td><a href={`tel:${lead.mobile}`}>{lead.mobile}</a></td>
                   <td>{lead.location}</td>
                   <td>{lead.guests || '-'}</td>
-                  <td>{lead.date || '-'}</td>
+                  <td>{lead.date || '-'}{lead.time ? <><br />{displayTime(String(lead.time).slice(0, 5))}</> : ''}</td>
                   <td>{lead.request}</td>
                 </tr>
-              )) : <tr><td colSpan="8">No leads saved yet. Submit a booking, event, franchise or investor form to see it here.</td></tr>}
+              )) : <tr><td colSpan="9">No leads match the selected filters.</td></tr>}
             </tbody>
           </table>
         </div>
