@@ -144,3 +144,96 @@ footer{padding:62px 7vw 24px;color:#eadbd1}
   .footer-bottom{font-size:.72rem}
   .developer-credit{justify-content:flex-start;flex-wrap:wrap}
 }
+
+/* Footer redesign, legal pages, menu sections, and family section refresh */
+.carousel-meta{justify-content:flex-start}
+
+.why-family{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(420px,1.1fr);gap:32px;align-items:start;background:linear-gradient(180deg,#fffdf8,#f7f0e4)}
+.why-family-copy{padding:34px;border:1px solid #ead9c1;background:#fffaf2;box-shadow:0 18px 45px #311b100c}
+.why-family-copy .eyebrow{margin-bottom:10px}
+.why-family-copy h2{font-family:'Playfair Display',serif;font-size:clamp(2.7rem,4.2vw,4.5rem);line-height:.95;margin:0 0 18px}
+.why-family-copy p{margin:0;color:var(--muted);line-height:1.75;font-size:1rem}
+.why-family-image{margin-top:28px;overflow:hidden;border-radius:22px;box-shadow:0 24px 55px #3d1f120f}
+.why-family-image img{width:100%;height:100%;display:block;object-fit:cover}
+.why-family-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.why-family-card{padding:28px 24px;border-radius:22px;border:1px solid #eadfce;background:#fff;box-shadow:0 16px 40px #321b1208;text-align:center}
+.why-family-icon{width:68px;height:68px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#d8a34e,#bf7f2f);color:#fff;box-shadow:0 10px 24px #bf7f2f2b}
+.why-family-icon svg{width:30px;height:30px}
+.why-family-card h3{font-family:'Playfair Display',serif;font-size:1.45rem;margin:0 0 10px}
+.why-family-card p{margin:0;color:var(--muted);font-size:.85rem;line-height:1.7}
+
+.menu-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.menu-section-card{background:#fff;border:1px solid #e7dccb;border-radius:22px;padding:24px;box-shadow:0 16px 40px #311b1008}
+.menu-section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-bottom:14px;border-bottom:1px solid #eee2cf}
+.menu-section-head span{font-family:'Playfair Display',serif;font-size:1.9rem;color:var(--maroon)}
+.menu-section-head svg{color:var(--gold)}
+.menu-section-list{display:grid;gap:14px;padding-top:18px}
+.menu-line h3{margin:0;font-family:'DM Sans',sans-serif;font-size:1.02rem}
+.menu-line p{margin:7px 0 0;color:var(--muted);font-size:.8rem;line-height:1.65}
+
+.legal-page{display:grid;gap:24px}
+.legal-intro{padding:24px 28px;border-left:4px solid var(--gold);background:#fff9ef;color:#5e4b42;line-height:1.75;font-size:1rem}
+.legal-intro p{margin:0}
+.legal-sections{display:grid;gap:18px}
+.legal-card{padding:28px;border:1px solid #e6dac8;border-radius:18px;background:#fff;box-shadow:0 14px 36px #311b1008}
+.legal-card h2{margin:0 0 14px;font-size:1.6rem}
+.legal-card ul{margin:0;padding-left:20px;display:grid;gap:10px;color:#5e4b42;line-height:1.75}
+
+.sitemap-page{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.sitemap-link{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-radius:18px;border:1px solid #e6dac8;background:#fff;box-shadow:0 14px 36px #311b1008;font-weight:700;color:var(--maroon)}
+.sitemap-link svg{width:18px}
+
+footer{background:linear-gradient(115deg,#26130f,#391d16 58%,#29140f);padding:0 7vw 24px;overflow:hidden}
+.footer-main{grid-template-columns:1.45fr .62fr .85fr 1.05fr .88fr;gap:34px;align-items:start}
+.footer-brand-panel{display:flex;margin-left:-7vw}
+.footer-brand-card{padding:48px 56px 46px max(7vw,56px);background:#f8efdf;border-radius:0 150px 150px 0;min-height:430px;width:100%;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;color:var(--brown);box-shadow:none}
+.footer-brand-card img{width:100%;max-width:275px;height:165px;object-fit:contain;mix-blend-mode:multiply}
+.footer-brand-card p{margin:22px 0 8px;font-family:'Playfair Display',serif;font-size:1.85rem;line-height:1.15;color:var(--brown)}
+.footer-brand-card small{max-width:290px;font-size:.82rem;line-height:1.75;color:#674f42}
+.footer-community{display:flex;flex-direction:column;gap:18px}
+.footer-community h4{margin-bottom:0}
+.google-rating{margin-top:12px;padding:16px 17px;border:1px solid #d6a9506b;display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;color:#fff}
+.google-mark{font-size:2rem;font-weight:900;color:#4285f4}
+.google-rating span:nth-child(2){display:flex;flex-direction:column}
+.google-rating b{font-size:1.35rem;line-height:1}
+.google-rating small{margin-top:4px;color:#c7b0a2;font-size:.58rem;line-height:1.35}
+.google-rating div{color:#e59b39;letter-spacing:1px;font-size:.7rem}
+.footer-highlights{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:34px;padding:18px 0;border-top:1px solid #ffffff17;border-bottom:1px solid #ffffff17}
+.footer-highlights>div{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 18px;color:#ecd9cc}
+.footer-highlights>div+div{border-left:1px solid #ffffff12}
+.footer-highlights svg{width:20px;height:20px;color:#edc77b;flex:none}
+.footer-highlights span{display:flex;flex-direction:column;gap:2px}
+.footer-highlights b{font-size:.82rem;font-weight:700}
+.footer-highlights small{font-size:.66rem;color:#bca79a}
+.footer-bottom{margin-top:22px}
+
+@media(max-width:1100px){
+  .why-family{grid-template-columns:1fr}
+  .footer-main{grid-template-columns:1.25fr repeat(2,1fr)}
+  .footer-brand-panel{grid-row:span 2}
+  .footer-community{grid-column:3}
+  .footer-highlights{grid-template-columns:repeat(3,1fr)}
+}
+
+@media(max-width:800px){
+  .why-family-grid,.menu-sections,.sitemap-page{grid-template-columns:1fr}
+  .footer-main{grid-template-columns:1fr 1fr}
+  .footer-brand-panel,.footer-contact{grid-column:1/-1}
+  .footer-brand-panel{grid-row:auto;margin-right:-7vw}
+  .footer-brand-card{min-height:auto;border-radius:0;padding-top:42px;padding-bottom:42px}
+  .footer-community{grid-column:auto}
+  .footer-highlights{grid-template-columns:1fr 1fr}
+  .footer-highlights>div:nth-child(odd){border-left:0}
+}
+
+@media(max-width:520px){
+  .why-family-copy{padding:24px}
+  .why-family-card{padding:24px 20px}
+  .legal-card{padding:22px}
+  .footer-main{grid-template-columns:1fr}
+  .footer-community{grid-column:auto}
+  .footer-highlights{grid-template-columns:1fr}
+  .footer-highlights>div{width:190px;margin:0 auto;justify-content:flex-start}
+  .footer-highlights>div+div{border-left:0;border-top:1px solid #ffffff12}
+  .footer-highlights svg{width:22px}
+}

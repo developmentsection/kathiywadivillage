@@ -48,6 +48,9 @@ const phone = '+91 99983 21265'
 const email = 'info@kathiyawadivillage.com'
 const hours = '11:00 AM - 3:00 PM & 7:00 PM - 11:00 PM'
 const weekendNote = 'Saturday, Sunday and festive-season tables fill quickly. Please book in advance and visit only after branch confirmation.'
+const usaLocationPath = '/locations/new-jersey-usa'
+const customerCount = '10 Lac+'
+const customerServedLabel = 'Customer Served'
 const bookingSlots = [
   '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
   '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30',
@@ -136,24 +139,339 @@ const expansionCities = [
   { name: 'New Jersey', region: 'United States', image: '/images/expansion/new-jersey.jpg', landmark: 'New Brunswick, New Jersey skyline at sunset' },
 ]
 
-const menuItems = [
-  ['Kathiyawadi', 'Sev Tameta', 'Tangy tomato curry finished with crisp sev'],
-  ['Kathiyawadi', 'Ringan No Olo', 'Fire-roasted brinjal, village-style tadka'],
-  ['Kathiyawadi', 'Lasaniya Bataka', 'Potatoes with a bold garlic masala'],
-  ['Kathiyawadi', 'Rajwadi Gathiya', 'Our rich royal-style signature'],
-  ['Punjabi', 'Paneer Handi', 'Creamy, aromatic, slow-cooked paneer'],
-  ['Punjabi', 'Kaju Curry', 'Golden cashew curry, delicately spiced'],
-  ['Punjabi', 'Paneer Butter Masala', 'Classic buttery tomato gravy'],
-  ['Chinese', 'Noodles', 'Wok-tossed vegetables and noodles'],
-  ['Chinese', 'Fried Rice', 'Fragrant rice, vegetables and sauces'],
-  ['Chinese', 'Manchurian', 'Crisp vegetable dumplings in gravy'],
-  ['Breads', 'Butter Naan', 'Tandoor-baked and butter-brushed'],
-  ['Breads', 'Garlic Naan', 'Tandoor-baked with fresh garlic'],
-  ['Rotla', 'Bajri Rotla', 'Traditional pearl millet flatbread'],
-  ['Rotla', 'Wagharelo Rotlo', 'Garlic-tempered village favourite'],
-  ['Paratha', 'Lachha Paratha', 'Layered, flaky and tandoor-baked'],
-  ['Paratha', 'Stuffed Paratha', 'Comforting seasonal filling'],
+const menuSections = [
+  {
+    category: 'Beverages',
+    items: ['Plain Chhas', 'Jeera Chhas', 'Masala Chhas', 'Sweet Lassi', 'Salted Lassi', 'Dry Fruit Lassi', 'Fresh Lime Soda', 'Packaged Drinking Water', 'Aerated / Soft Drinks'],
+  },
+  {
+    category: 'Papad / Papdi',
+    items: ['Roasted Papad', 'Fried Papad', 'Masala Papad', 'Cheese Masala Papad', 'Fried Papdi', 'Masala Papdi', 'French Fries', 'Peri Peri French Fries'],
+  },
+  {
+    category: 'Salad & Raita',
+    items: ['Curd', 'Boondi Raita', 'Green Salad', 'Vegetable Raita'],
+  },
+  {
+    category: 'Karari Roomali',
+    items: ['Karari Roomali', 'Peri Peri Karari', 'Cheese Karari', 'Peri Peri Cheese Karari'],
+  },
+  {
+    category: 'Soup',
+    items: ['Tomato Cream Soup', 'Veg Sweet Corn Soup', 'Veg Manchow Soup', 'Hot & Sour Soup', 'Lemon Coriander Soup'],
+  },
+  {
+    category: 'Appetizers',
+    items: [
+      'Wagharelo Rotlo',
+      'Kathiyawadi Ghughra',
+      'Garlic Wagharelo Rotlo',
+      'Cheese Ghughra',
+      'Dal Dhokli',
+      'Hara Bhara Kabab',
+      'Paneer Tikka',
+      'Haryali Paneer Tikka',
+      'Zafrani Paneer Tikka',
+      'Lasaniya Paneer Tikka',
+      'Vegetable Manchurian - Dry/Gravy',
+      'Tandoori Mushroom',
+      'Vegetable Crispy',
+      'Afghani Paneer Tikka',
+      'Paneer Chilly - Dry/Gravy',
+      'Vegetable Spring Roll',
+      'Gobi Manchurian - Dry/Gravy',
+      'Cheese Stick',
+    ],
+  },
+  {
+    category: 'Kathiyawad Ni Suvas',
+    items: [
+      'Lilli Dungri Sev',
+      'Ringan Bharthu',
+      'Kaju Gathiya',
+      'Kathiyawadi Ghotala',
+      'Dahi Tikhari',
+      'Sev Dungri Tameta',
+      'Sukki Bhaji',
+      'Sev Tameta',
+      'Sev Dungri',
+      'Lasaniya Gathiya',
+      'Lasaniya Sev',
+      'Lasaniya Bataka',
+      'Rajwadi Dhokli',
+      'Bharela Ringan',
+      'Papad Bhurji',
+      'Bhindi Masala',
+    ],
+  },
+  {
+    category: 'Rajasthan Ni Mahek',
+    items: ['Special Dal Bati Churma', 'Dal Bati', 'Rajasthani Dal', 'Dahi Bhindi', 'Besan Gatta', 'Extra Bati'],
+  },
+  {
+    category: 'Indian Punjabi Tadka',
+    items: [
+      'Cheese Butter Masala',
+      'Kaju Curry',
+      'Paneer Tikka Masala',
+      'Kofta Nargisi Do Pyaza',
+      'Palak Paneer',
+      'Kadai Paneer',
+      'Paneer Kolhapuri',
+      'Paneer Tawa Masala',
+      'Paneer Butter Masala',
+      'Paneer Toofani',
+      'Paneer Bhurji',
+      'Paneer Angara',
+      'Malai Kofta',
+      'Kaju Masala',
+      'Vegetable Kadai',
+      'Vegetable Kolhapuri',
+      'Vegetable Makhanwala',
+      'Vegetable Handi',
+      'Vegetable Toofani',
+      'Vegetable Hariyali',
+      'Mushroom Masala',
+    ],
+  },
+  {
+    category: 'Chinese Cuisine',
+    items: ['Veg Fried Rice', 'Hakka Noodles', 'Schezwan Noodles', 'Manchurian Noodles', 'Manchurian Fried Rice', 'Schezwan Fried Rice', 'Chilly Garlic Fried Rice', 'Vegetable In Hot Garlic Sauce'],
+  },
+  {
+    category: 'Tawa Ni Roti',
+    items: ['Plain Phulka', 'Butter Phulka', 'Butter Tawa Paratha', 'Biscuit Bhakhri', 'Assorted Kathiyawadi Roti / Rotlo Basket (Ghee)', 'Rotlo', 'Lasaniya Rotlo', 'Ghee Rotlo', 'Ghee Lasaniya Rotlo', 'Ghee', 'Desi Gud'],
+  },
+  {
+    category: 'Tandoor Ni Roti',
+    items: ['Plain Roti', 'Butter Roti', 'Missi Roti', 'Assorted Roti Basket (Butter)', 'Plain Naan / Kulcha / Paratha', 'Butter Naan / Kulcha / Paratha', 'Garlic Naan', 'Cheese Naan', 'Garlic Cheese Naan'],
+  },
+  {
+    category: 'Khichdi / Kadhi',
+    items: ['Plain Khichdi', 'Masala Khichdi', 'Rajwadi Khichdi', 'Punjabi Dal Khichdi', 'Gujarati Kadhi', 'Rajwadi Kadhi'],
+  },
+  {
+    category: 'Rice / Biryani',
+    items: ['Steam Rice', 'Jeera Rice', 'Vegetable Pulao', 'Veg Biryani', 'Hyderabadi Biryani', 'Handi Dum Biryani', 'Matka Dum Biryani'],
+  },
+  {
+    category: 'Dal',
+    items: ['Dal Fry', 'Dal Tadka', 'Dal Palak', 'Dal Makhani'],
+  },
+  {
+    category: 'Sweet',
+    items: ['Gulab Jamun (4 Nos)', 'Churma Ladoo', 'Desi Ghee Churma', 'Rotlo And Gor Churma', 'Fried Ice Cream'],
+  },
+  {
+    category: 'Family Celebration Menus',
+    items: [
+      {
+        name: 'Gujarati Unlimited',
+        detail: 'Starter: Mix Bhajiya / Methi Gota / Besan Na Gota. Main course: Bhindi Masala / Ghiloda / Dudhi Chana / Ringan Bataka / Methi Ringan / Rasa Bataka / Dry Bataka. Kathor: Mug Masala / Rajma Masala / Chana Masala / Chowli Masala / Vaal Masala. Includes Gujarati daal bhaat, phulka, chhas, pickle, papad, kachumber, and one sweet.',
+      },
+      {
+        name: 'Kathiyawadi Unlimited',
+        detail: 'Starter: Wagharelo Rotlo or Dal Dhokli. Main course: Sev Tamata / Lasaniya Bataka / Ringan Bharthu / Rajwadi Dhokli / Dahi Gathiya / Sev Dungri. Includes roti choices, kadhi, khichdi, chhas, pickle, papad, kachumber, and one sweet.',
+      },
+      {
+        name: 'Punjabi Unlimited',
+        detail: 'Soup: Manchow / Hot & Sour / Tomato Soup / Veg Coriander. Starter: Hara Bhara Kabab / Manchurian / Veg Crispy / Corn Tikki. Main course: one paneer item and one veg item with roti, daal, rice, accompaniments, and one sweet.',
+      },
+    ],
+  },
 ]
+
+const legalPages = {
+  disclaimer: {
+    eyebrow: 'Legal',
+    title: 'Disclaimer',
+    effectiveDate: '28 June 2026',
+    intro: 'This website is owned and operated by Khodal Foods & Hospitality Pvt. Ltd. The information published here is shared in good faith for general informational purposes.',
+    sections: [
+      {
+        heading: 'General Information',
+        points: [
+          'Menus, descriptions, offers, photos, and restaurant information are published for general guidance only.',
+          'We try to keep every page accurate and up to date, but we do not guarantee completeness, reliability, or accuracy at all times.',
+        ],
+      },
+      {
+        heading: 'Menu, Pricing, and Food Information',
+        points: [
+          'Menu items, ingredients, portion sizes, pricing, and availability may vary by branch and may change without prior notice.',
+          'Food photographs are for illustration only. Actual presentation can differ by location, season, and service format.',
+          'Guests with allergies or dietary restrictions should inform the team before ordering.',
+          'While reasonable precautions are taken, an allergen-free kitchen environment cannot be guaranteed because of shared equipment and preparation areas.',
+        ],
+      },
+      {
+        heading: 'Reservations and Service Availability',
+        points: [
+          'Submitting a reservation request does not guarantee confirmation.',
+          'Reservations remain subject to table availability and operational requirements.',
+          'Kathiyawadi Village may modify, reschedule, or cancel reservations when required for operations or guest safety.',
+          'Temporary downtime caused by maintenance, connectivity issues, cybersecurity incidents, or force majeure may affect website access.',
+        ],
+      },
+      {
+        heading: 'Third-Party Links and Limitation of Liability',
+        points: [
+          'The website may link to third-party services such as Google Maps, Google Reviews, Facebook, Instagram, LinkedIn, WhatsApp, and online reservation platforms.',
+          'We do not control third-party content, privacy practices, or service policies and are not responsible for what those services provide.',
+          'Khodal Foods & Hospitality Pvt. Ltd. is not liable for direct, indirect, incidental, consequential, or special damages arising from website use, incorrect information, downtime, omissions, or reliance on third-party services.',
+        ],
+      },
+      {
+        heading: 'Intellectual Property and Updates',
+        points: [
+          'The logo, brand name, text, images, videos, graphics, icons, menu designs, trademarks, and website layout are the exclusive property of Khodal Foods & Hospitality Pvt. Ltd.',
+          'Unauthorized copying, reproduction, modification, distribution, or commercial use is prohibited without prior written permission.',
+          'This disclaimer may be updated at any time, and changes become effective when published on the website.',
+        ],
+      },
+      {
+        heading: 'Contact Information',
+        points: [
+          'Khodal Foods & Hospitality Pvt. Ltd.',
+          'Kathiyawadi Village Restaurant, Sama-Savli Road, Vemali, Vadodara, Gujarat - 390024',
+          'Phone: +91 99983 21265',
+          'Email: info@kathiyawadivillage.com',
+          'Website: www.kathiyawadivillage.com',
+        ],
+      },
+    ],
+  },
+  privacy: {
+    eyebrow: 'Legal',
+    title: 'Privacy Policy',
+    effectiveDate: '28 June 2026',
+    intro: 'Kathiyawadi Village values your privacy and is committed to protecting the personal information you share with us through this website and our services.',
+    sections: [
+      {
+        heading: 'Company Information',
+        points: [
+          'Company: Khodal Foods & Hospitality Pvt. Ltd.',
+          'Restaurant Brand: Kathiyawadi Village',
+          'Registered Address: Sama-Savli Road, Vemali, Vadodara, Gujarat - 390024, India',
+          'Phone: +91 99983 21265',
+          'Email: info@kathiyawadivillage.com',
+        ],
+      },
+      {
+        heading: 'Information We Collect',
+        points: [
+          'Name, mobile number, email address, reservation details, event booking details, franchise enquiry information, and feedback you voluntarily submit.',
+          'Technical information such as IP address, browser details, device information, cookies, and general website usage data.',
+        ],
+      },
+      {
+        heading: 'How We Use Information',
+        points: [
+          'To manage table bookings, party orders, event enquiries, and customer support.',
+          'To respond to franchise and business enquiries.',
+          'To send confirmations, improve the website experience, support security and fraud prevention, and comply with legal obligations.',
+          'To share promotional communication only where permitted or requested.',
+        ],
+      },
+      {
+        heading: 'Cookies and Sharing',
+        points: [
+          'Cookies may be used to remember preferences, improve performance, analyze traffic, and enhance user experience. You can disable them in your browser settings.',
+          'We do not sell, rent, or trade personal information.',
+          'Information may be shared only with trusted service providers, when required by law, to protect legal rights, or as part of a business restructuring if applicable.',
+        ],
+      },
+      {
+        heading: 'Security, Third Parties, and Children',
+        points: [
+          'Administrative, technical, and physical safeguards are used to protect personal information, though no internet transmission method is completely secure.',
+          'Third-party services such as Google Maps, Google Reviews, WhatsApp, Instagram, Facebook, LinkedIn, reservation tools, or payment providers maintain their own policies.',
+          'This website is not intended for children under 13, and we do not knowingly collect personal information from children.',
+        ],
+      },
+      {
+        heading: 'Your Rights',
+        points: [
+          'You may request access to your information, correction of inaccurate details, deletion of data, withdrawal of marketing consent, or information about stored personal data.',
+          'Requests can be made using the contact details below.',
+        ],
+      },
+      {
+        heading: 'Policy Updates and Contact',
+        points: [
+          'This privacy policy may be updated at any time. Revised versions will be published with the updated effective date.',
+          'Contact: Khodal Foods & Hospitality Pvt. Ltd., Kathiyawadi Village Restaurant, Sama-Savli Road, Vemali, Vadodara, Gujarat - 390024',
+          'Phone: +91 99983 21265',
+          'Email: info@kathiyawadivillage.com',
+          'Website: www.kathiyawadivillage.com',
+        ],
+      },
+    ],
+  },
+  terms: {
+    eyebrow: 'Legal',
+    title: 'Terms & Conditions',
+    effectiveDate: '28 June 2026',
+    intro: 'These terms govern the use of the Kathiyawadi Village website and services, including reservations, enquiries, online interactions, and restaurant information.',
+    sections: [
+      {
+        heading: 'Acceptance and Website Usage',
+        points: [
+          'By using this website, you confirm that you have read, understood, and agreed to these terms.',
+          'The website must be used only for lawful purposes.',
+          'Users must not attempt unauthorized access, upload malicious code, misrepresent their identity, or copy and distribute website content without permission.',
+        ],
+      },
+      {
+        heading: 'Reservations, Orders, and Menu Information',
+        points: [
+          'Reservations are subject to availability and may be modified or cancelled due to operational requirements.',
+          'Guests are expected to arrive on time. Delays may affect the reservation based on availability.',
+          'Menu items, offers, ingredients, and availability may vary by branch and may change without prior notice.',
+          'Food images are for illustration only and may differ from actual presentation.',
+          'Estimated order preparation or delivery times are approximate and may vary due to operations, traffic, weather, or festivals.',
+        ],
+      },
+      {
+        heading: 'Payments and Intellectual Property',
+        points: [
+          'Payments for applicable website services must be completed successfully before confirmation.',
+          'Kathiyawadi Village does not store debit card, credit card, UPI, or banking credentials.',
+          'The website content, including the logo, brand name, text, images, videos, graphics, icons, menu design, and website design, is the exclusive property of Khodal Foods & Hospitality Pvt. Ltd.',
+          'Unauthorized copying, reproduction, or commercial use is prohibited.',
+        ],
+      },
+      {
+        heading: 'Customer Conduct and Liability',
+        points: [
+          'Service may be refused in cases of abusive language, threatening behaviour, harassment, illegal activities, or damage to property.',
+          'Guests should inform staff about allergies or dietary restrictions before ordering.',
+          'While precautions are taken, an allergen-free kitchen cannot be guaranteed.',
+          'Khodal Foods & Hospitality Pvt. Ltd. is not liable for technical interruptions, third-party failures, delays caused by unforeseen circumstances, or losses arising from misuse of the website.',
+        ],
+      },
+      {
+        heading: 'Third Parties, Privacy, and Updates',
+        points: [
+          'The website may link to external services such as Google Maps, Google Reviews, Instagram, Facebook, LinkedIn, and WhatsApp.',
+          'Use of the website is also governed by the Privacy Policy.',
+          'These terms may be updated without prior notice, and changes become effective when published.',
+        ],
+      },
+      {
+        heading: 'Governing Law and Contact',
+        points: [
+          'These terms are governed by the laws of India.',
+          'Any disputes relating to website use or services will be subject to the competent courts of Vadodara, Gujarat.',
+          'Contact: Khodal Foods & Hospitality Pvt. Ltd., Kathiyawadi Village Restaurant, Sama-Savli Road, Vemali, Vadodara, Gujarat - 390024',
+          'Phone: +91 99983 21265',
+          'Email: info@kathiyawadivillage.com',
+          'Website: www.kathiyawadivillage.com',
+        ],
+      },
+    ],
+  },
+}
 
 const whatsapp = (text, number = WA) =>
   window.open(`https://wa.me/${number}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
@@ -197,9 +515,9 @@ function Header() {
         <span>From Gujarat To The World</span>
         <div className="top-contact">
           <a href={`tel:${phone}`}><Phone size={12} /> {phone}</a>
-          <a className="country" href="https://usa.kathiyawadivillage.com">
+          <Link className="country" to={usaLocationPath}>
             <Globe2 size={13} /> India - USA <ChevronDown size={12} />
-          </a>
+          </Link>
         </div>
       </div>
       <div className="nav-wrap">
@@ -261,6 +579,14 @@ function Header() {
 }
 
 function Footer() {
+  const footerHighlights = [
+    [Users, customerCount, 'Happy Guests'],
+    [Award, '100%', 'Pure Vegetarian'],
+    [Heart, 'Family', 'Friendly'],
+    [CalendarDays, 'Party & Event', 'Bookings'],
+    [MapPin, 'Spacious', 'Parking'],
+  ]
+
   return (
     <>
       <section className="footer-cta">
@@ -273,19 +599,17 @@ function Footer() {
       </section>
       <footer>
         <div className="footer-main">
-          <div className="footer-brand">
-            <img src="/images/kathiyawadi-village-logo-cropped.png" alt="Kathiyawadi Village - Multi Cuisine Restaurant" />
-            <p>From Gujarat To The World - serving authentic hospitality, one plate at a time.</p>
-            <div className="socials">
-              <a aria-label="LinkedIn" href="https://in.linkedin.com/in/kathiyawadi-village-025b37322" target="_blank" rel="noreferrer"><FaLinkedinIn /></a>
-              <a aria-label="Instagram" href="https://www.instagram.com/kathiyawadi_village" target="_blank" rel="noreferrer"><FaInstagram /></a>
-              <a aria-label="Facebook" href="https://www.facebook.com/people/Kathiyawadi-village/61577657022329/" target="_blank" rel="noreferrer"><FaFacebookF /></a>
+          <div className="footer-brand-panel">
+            <div className="footer-brand-card">
+              <img src="/images/kathiyawadi-village-logo-cropped.png" alt="Kathiyawadi Village - Multi Cuisine Restaurant" />
+              <p>From Gujarat To The World</p>
+              <small>Serving authentic Kathiyawadi hospitality with timeless recipes, warm service, and family-style dining experiences.</small>
             </div>
           </div>
           <div className="footer-links">
             <h4>Explore</h4>
             <Link to="/about">Our Story</Link>
-            <Link to="/menu">Smart Menu</Link>
+            <Link to="/menu">Menu</Link>
             <Link to="/locations">All Locations</Link>
             <Link to="/careers">Careers</Link>
             <Link to="/contact">Contact Us</Link>
@@ -299,20 +623,41 @@ function Footer() {
             ))}
           </div>
           <div className="footer-contact">
-            <h4>Contact & Hours</h4>
+            <h4>Contact Us</h4>
             <a href={`tel:${phone}`}><Phone /> <span><b>{phone}</b><small>Central reservations</small></span></a>
             <a href={`mailto:${email}`}><Mail /> <span><b>{email}</b><small>General enquiries</small></span></a>
             <p><Clock3 /><span><b>{hours}</b><small>Open every day</small></span></p>
             <p><MapPin /><span><b>Vadodara, Gujarat</b><small>Khodal Foods & Hospitality Pvt. Ltd.</small></span></p>
           </div>
+          <div className="footer-community">
+            <h4>Follow Us</h4>
+            <div className="socials">
+              <a aria-label="Facebook" href="https://www.facebook.com/people/Kathiyawadi-village/61577657022329/" target="_blank" rel="noreferrer"><FaFacebookF /></a>
+              <a aria-label="Instagram" href="https://www.instagram.com/kathiyawadi_village" target="_blank" rel="noreferrer"><FaInstagram /></a>
+              <a aria-label="LinkedIn" href="https://in.linkedin.com/in/kathiyawadi-village-025b37322" target="_blank" rel="noreferrer"><FaLinkedinIn /></a>
+            </div>
+            <div className="google-rating" aria-label="Google rating 4.7 out of 5">
+              <span className="google-mark">G</span>
+              <span><b>4.7</b><small>Google Rating<br />Based on 5,000+ reviews</small></span>
+              <div aria-hidden="true">★★★★★</div>
+            </div>
+          </div>
+        </div>
+        <div className="footer-highlights">
+          {footerHighlights.map(([Icon, title, text]) => (
+            <div key={`${title}-${text}`}>
+              <Icon />
+              <span><b>{title}</b><small>{text}</small></span>
+            </div>
+          ))}
         </div>
         <div className="footer-bottom">
-          <span>Copyright 2026 Khodal Foods & Hospitality Pvt. Ltd.</span>
+          <span>© 2026 Khodal Foods & Hospitality Pvt. Ltd. All Rights Reserved.</span>
           <div>
-            <Link to="/lead-dashboard">Owner Leads</Link>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms</a>
-            <a href="#">Sitemap</a>
+            <Link to="/privacy-policy">Privacy Policy</Link>
+            <Link to="/terms-and-conditions">Terms & Conditions</Link>
+            <Link to="/disclaimer">Disclaimer</Link>
+            <Link to="/sitemap">Sitemap</Link>
           </div>
           <small>Authentic hospitality, one plate at a time.</small>
         </div>
@@ -366,7 +711,6 @@ function ExpansionCarousel() {
       </div>
       <div className="carousel-meta">
         <p className="carousel-hint">Swipe or use the arrows to explore</p>
-        <a href="/images/expansion/ATTRIBUTION.txt" target="_blank" rel="noreferrer">Photo credits</a>
       </div>
     </section>
   )
@@ -525,7 +869,7 @@ function Home() {
           </div>
           <div className="hero-proof">
             <div><b>4.5+</b><span>Average Rating</span></div>
-            <div><b>10 Lac+</b><span>Customers Everywhere</span></div>
+            <div><b>{customerCount}</b><span>{customerServedLabel}</span></div>
             <div><b>7</b><span>Locations</span></div>
           </div>
         </div>
@@ -537,10 +881,6 @@ function Home() {
           <span className="eyebrow">Your table awaits</span>
           <h2>Reserve a memorable meal.</h2>
           <p>Choose your nearest Kathiyawadi Village and we will confirm your table personally on WhatsApp.</p>
-          <div className="booking-hours">
-            <Clock3 />
-            <span><b>{hours}</b><small>{weekendNote}</small></span>
-          </div>
           <div className="mini-trust"><Phone size={17} /><span>Need help? Call <b>{phone}</b></span></div>
         </div>
         <BookingForm />
@@ -644,7 +984,7 @@ function Stats() {
   return (
     <section className="stats">
       {[
-        ['10 Lac+', 'Customers Everywhere'],
+        [customerCount, customerServedLabel],
         ['10,000+', 'Google Reviews'],
         ['7', 'Locations'],
         ['4.5+', 'Average Rating'],
@@ -654,24 +994,32 @@ function Stats() {
 }
 
 function WhyChooseUs() {
+  const features = [
+    [ChefHat, 'Authentic Taste', 'Traditional Kathiyawadi flavours prepared with care, balance, and rich regional character.'],
+    [Award, 'Quality Ingredients', 'Fresh ingredients and careful preparation keep every dish honest, vibrant, and satisfying.'],
+    [Users, 'Family Friendly', 'Comfortable seating, warm service, and a setting that works beautifully for every generation.'],
+    [Heart, 'Hygienic & Safe', 'Clean kitchens, careful handling, and service standards your family can feel good about.'],
+    [Star, 'Excellent Service', 'Attentive staff, timely support, and a hospitality-first experience from entry to dessert.'],
+    [Utensils, 'Great Ambience', 'Thoughtful interiors and a lively, welcoming atmosphere that makes every meal feel special.'],
+  ]
+
   return (
-    <section className="why section-pad">
-      <SectionTitle eyebrow="The Village Promise" title="Why families choose us." text="Everything we do begins with good food and ends with genuine care." />
-      <div className="feature-grid">
-        {[
-          [Heart, 'Authentic Taste', 'Recipes rooted in Kathiyawad, cooked with honest village flavour.'],
-          [Award, 'Pure Vegetarian', 'Trusted pure veg dining for families, groups and celebrations.'],
-          [Users, 'Family Friendly', 'Warm service, generous seating and comfort for every generation.'],
-          [MapPin, 'Multiple Locations', 'Seven destinations across Gujarat and global expansion markets.'],
-          [CalendarDays, 'Party Orders', 'Birthdays, anniversaries and corporate meals made effortless.'],
-          [ChefHat, 'Catering Services', 'Professional hospitality for weddings, functions and outdoor events.'],
-        ].map(([Icon, title, text]) => (
-          <div className="feature-card" key={title}>
-            <span className="feature-number">KV</span>
-            <Icon />
+    <section className="why-family section-pad">
+      <div className="why-family-copy">
+        <span className="eyebrow">Why Family</span>
+        <h2>Choose Our Restaurant</h2>
+        <p>Good food, warm hospitality, and memorable moments - that's what families remember every time they visit Kathiyawadi Village.</p>
+        <div className="why-family-image">
+          <img src="/images/signature-feast.png" alt="Signature Kathiyawadi dishes served for families" />
+        </div>
+      </div>
+      <div className="why-family-grid">
+        {features.map(([Icon, title, text]) => (
+          <article className="why-family-card" key={title}>
+            <div className="why-family-icon"><Icon /></div>
             <h3>{title}</h3>
             <p>{text}</p>
-          </div>
+          </article>
         ))}
       </div>
     </section>
@@ -831,15 +1179,35 @@ function Branch() {
 }
 
 function SmartMenu() {
-  const cats = ['All', ...new Set(menuItems.map(item => item[0]))]
+  const cats = ['All', ...menuSections.map(section => section.category)]
   const [active, setActive] = useState('All')
-  const shown = active === 'All' ? menuItems : menuItems.filter(item => item[0] === active)
+  const shown = active === 'All' ? menuSections : menuSections.filter(section => section.category === active)
   return (
     <main>
-      <PageHero eyebrow="Pure Veg - Multi Cuisine" title="A menu made for every mood." text="From beloved Kathiyawadi classics to Punjabi comfort and wok-tossed favourites." />
+      <PageHero eyebrow="Pure Veg - Multi Cuisine" title="A menu made for every mood." text="Every visible item from our Sama menu, thoughtfully organized and shown without prices." />
       <section className="menu-page section-pad">
         <div className="filters">{cats.map(cat => <button className={active === cat ? 'active' : ''} type="button" onClick={() => setActive(cat)} key={cat}>{cat}</button>)}</div>
-        <div className="menu-grid">{shown.map(item => <article key={item[1]}><div><span>{item[0]}</span><h3>{item[1]}</h3><p>{item[2]}</p></div><Star size={18} /></article>)}</div>
+        <div className="menu-sections">
+          {shown.map(section => (
+            <article className="menu-section-card" key={section.category}>
+              <div className="menu-section-head">
+                <span>{section.category}</span>
+                <Star size={18} />
+              </div>
+              <div className="menu-section-list">
+                {section.items.map(item => {
+                  const normalized = typeof item === 'string' ? { name: item } : item
+                  return (
+                    <div className="menu-line" key={normalized.name}>
+                      <h3>{normalized.name}</h3>
+                      {normalized.detail && <p>{normalized.detail}</p>}
+                    </div>
+                  )
+                })}
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
     </main>
   )
@@ -910,7 +1278,7 @@ function Franchise() {
       <PageHero eyebrow="Franchise Opportunity" title="Bring the Village to your city." text="Build a future-ready restaurant business with a loved Gujarati hospitality brand and an experienced operating team." />
       <section className="franchise-metrics">
         <div><b>7</b><span>Operating and upcoming locations</span></div>
-        <div><b>10 Lac+</b><span>Customers everywhere</span></div>
+        <div><b>{customerCount}</b><span>{customerServedLabel}</span></div>
         <div><b>1</b><span>Proven restaurant model</span></div>
         <div><b>Global</b><span>Expansion ambition</span></div>
       </section>
@@ -971,6 +1339,60 @@ function Contact() {
         <div><FaWhatsapp /><h3>WhatsApp</h3><button type="button" onClick={() => whatsapp('Hello Kathiyawadi Village, I would like to get in touch.')}>Start a conversation</button></div>
         <div><MapPin /><h3>Visit Us</h3><Link to="/locations">Explore all locations</Link></div>
         <div><Globe2 /><h3>Email</h3><a href={`mailto:${email}`}>{email}</a></div>
+      </section>
+    </main>
+  )
+}
+
+function LegalPage({ page }) {
+  return (
+    <main>
+      <PageHero eyebrow={page.eyebrow} title={page.title} text={`Effective Date: ${page.effectiveDate}`} />
+      <section className="legal-page section-pad">
+        <div className="legal-intro">
+          <p>{page.intro}</p>
+        </div>
+        <div className="legal-sections">
+          {page.sections.map(section => (
+            <article className="legal-card" key={section.heading}>
+              <h2>{section.heading}</h2>
+              <ul>
+                {section.points.map(point => <li key={point}>{point}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+  )
+}
+
+function SitemapPage() {
+  const siteLinks = [
+    ['Home', '/'],
+    ['Our Story', '/about'],
+    ['Locations', '/locations'],
+    ['Menu', '/menu'],
+    ['Celebrations', '/party-orders'],
+    ['Franchise', '/franchise'],
+    ['Investor Relations', '/investors'],
+    ['Careers', '/careers'],
+    ['Contact Us', '/contact'],
+    ['Privacy Policy', '/privacy-policy'],
+    ['Terms & Conditions', '/terms-and-conditions'],
+    ['Disclaimer', '/disclaimer'],
+  ]
+
+  return (
+    <main>
+      <PageHero eyebrow="Website Guide" title="Sitemap" text="Quick links to the key pages across the Kathiyawadi Village website." />
+      <section className="sitemap-page section-pad">
+        {siteLinks.map(([label, href]) => (
+          <Link className="sitemap-link" key={href} to={href}>
+            <span>{label}</span>
+            <ArrowRight />
+          </Link>
+        ))}
       </section>
     </main>
   )
@@ -1211,6 +1633,10 @@ function App() {
         <Route path="/investors" element={<Investors />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy-policy" element={<LegalPage page={legalPages.privacy} />} />
+        <Route path="/terms-and-conditions" element={<LegalPage page={legalPages.terms} />} />
+        <Route path="/disclaimer" element={<LegalPage page={legalPages.disclaimer} />} />
+        <Route path="/sitemap" element={<SitemapPage />} />
         <Route path="/lead-dashboard" element={<LeadDashboard />} />
       </Routes>
       <Footer />
